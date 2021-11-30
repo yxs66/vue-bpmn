@@ -69,7 +69,7 @@ export default {
   },
   watch: {
     businessObject: {
-      immediate: false,
+      immediate: true,
       handler(val) {
         this.bpmnElement = window.bpmnInstances.bpmnElement;
         this.getElementLoop(val);

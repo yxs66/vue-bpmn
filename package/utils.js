@@ -34,6 +34,20 @@ export function createListenerObject(options, isTask, prefix) {
   return window.bpmnInstances.moddle.create(`${prefix}:${isTask ? "TaskListener" : "ExecutionListener"}`, listenerObj);
 }
 
+export function createEventListenerObject(options, prefix) {
+  const listenerObj = Object.create(null);
+  listenerObj.events = options.events;
+  listenerObj.entityType = options.entityType;
+  switch (options.listenerType) {
+    case "delegateExpressionListener":
+      listenerObj.delegateExpression = options.delegateExpression;
+      break;
+    default:
+      listenerObj.class = options.class;
+  }
+  return window.bpmnInstances.moddle.create(`${prefix}:EventListener`, listenerObj);
+}
+
 // 创建 监听器的注入字段 实例
 export function createFieldObject(option, prefix) {
   const { name, fieldType, string, expression } = option;

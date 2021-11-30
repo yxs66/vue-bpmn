@@ -229,9 +229,6 @@
         }
       ]
     },
-
-
-
     {
       "name": "Signal",
       "isAbstract": true,
@@ -244,9 +241,35 @@
         }
       ]
     },
-
-
-    
+    {
+      "name": "EventListener",
+      "superClass": ["Element"],
+      "meta": {
+        "allowedIn": ["bpmn:Process"]
+      },
+      "properties": [
+        {
+          "name": "entityType",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "class",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "delegateExpression",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "events",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
     {
       "name": "Process",
       "isAbstract": true,

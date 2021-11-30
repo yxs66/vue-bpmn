@@ -2,7 +2,7 @@
   <div style="margin-top: 16px">
     <el-form-item label="处理用户">
       <el-select v-model="userTaskForm.assignee" @change="updateElementTask('assignee')">
-        <el-option v-for="ak in mockData" :key="'ass-' + ak" :label="`用户${ak}`" :value="`user${ak}`" />
+        <el-option v-for="ak in mockData" :key="'ass-' + ak" :label="`用户${ak}`" :value="'${' + `user${ak}` + '}'" />
       </el-select>
     </el-form-item>
     <el-form-item label="候选用户">

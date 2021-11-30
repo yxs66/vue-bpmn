@@ -3,7 +3,7 @@
     <el-table :data="elementListenersList" size="mini" border>
       <el-table-column label="序号" width="50px" type="index" />
       <el-table-column label="事件类型" min-width="80px" show-overflow-tooltip :formatter="row => listenerEventTypeObject[row.event]" />
-      <el-table-column label="事件id" min-width="80px" prop="id" show-overflow-tooltip />
+      <el-table-column label="事件id" v-if="this.prefix == 'camunda'" min-width="80px" prop="id" show-overflow-tooltip />
       <el-table-column label="监听器类型" min-width="80px" show-overflow-tooltip :formatter="row => listenerTypeObject[row.listenerType]" />
       <el-table-column label="操作" width="90px">
         <template slot-scope="{ row, $index }">
@@ -25,7 +25,7 @@
             <el-option v-for="i in Object.keys(listenerEventTypeObject)" :key="i" :label="listenerEventTypeObject[i]" :value="i" />
           </el-select>
         </el-form-item>
-        <el-form-item label="监听器ID" prop="id" :rules="{ required: true, trigger: ['blur', 'change'] }">
+        <el-form-item label="监听器ID" v-if="this.prefix == 'camunda'" prop="id" :rules="{ required: true, trigger: ['blur', 'change'] }">
           <el-input v-model="listenerForm.id" clearable />
         </el-form-item>
         <el-form-item label="监听器类型" prop="listenerType" :rules="{ required: true, trigger: ['blur', 'change'] }">
@@ -212,6 +212,14 @@ export default {
       listenerFieldForm: {} // 监听器 注入字段 详情表单
     };
   },
+  created() {
+    var type = eventType;
+    if (this.prefix != "camunda") {
+      delete type.update;
+      delete type.timeout;
+    }
+    this.listenerEventTypeObject = type;
+  },
   watch: {
     id: {
       immediate: true,
@@ -256,6 +264,8 @@ export default {
         .then(() => {
           this.bpmnElementListeners.splice(index, 1);
           this.elementListenersList.splice(index, 1);
+          // 保存其他配置
+          this.otherExtensionList = this.bpmnElement.businessObject?.extensionElements?.values?.filter(ex => ex.$type !== `${this.prefix}:TaskListener`) ?? [];
           updateElementExtensions(this.bpmnElement, this.otherExtensionList.concat(this.bpmnElementListeners));
         })
         .catch(() => console.info("操作取消"));
@@ -292,6 +302,12 @@ export default {
     async saveListenerFiled() {
       let validateStatus = await this.$refs["listenerFieldFormRef"].validate();
       if (!validateStatus) return; // 验证不通过直接返回
+      //排他处理
+      Object.keys(this.fieldTypeObject).forEach(x => {
+        if (this.listenerFieldForm.fieldType !== x) {
+          this.listenerFieldForm[x] = undefined;
+        }
+      });
       if (this.editingListenerFieldIndex === -1) {
         this.fieldsListOfListener.push(this.listenerFieldForm);
         this.listenerForm.fields.push(this.listenerFieldForm);

@@ -295,6 +295,7 @@ export default {
       let xmlString = xml || DefaultEmptyXML(newId, newName, this.prefix);
       try {
         let { warnings } = await this.bpmnModeler.importXML(xmlString);
+        this.processReZoom();
         if (warnings && warnings.length) {
           warnings.forEach(warn => console.warn(warn));
         }
@@ -308,13 +309,13 @@ export default {
       try {
         const _this = this;
         // 按需要类型创建文件并下载
-        if (type === "xml" || type === "bpmn") {
+        if (type === "bpmn20.xml" || type === "bpmn") {
           const { err, xml } = await this.bpmnModeler.saveXML();
           // 读取异常时抛出异常
           if (err) {
             console.error(`[Process Designer Warn ]: ${err.message || err}`);
           }
-          let { href, filename } = _this.setEncoded(type.toUpperCase(), name, xml);
+          let { href, filename } = _this.setEncoded(type, name, xml);
           downloadFunc(href, filename);
         } else {
           const { err, svg } = await this.bpmnModeler.saveSVG();
@@ -322,7 +323,7 @@ export default {
           if (err) {
             return console.error(err);
           }
-          let { href, filename } = _this.setEncoded("SVG", name, svg);
+          let { href, filename } = _this.setEncoded("svg", name, svg);
           downloadFunc(href, filename);
         }
       } catch (e) {
@@ -362,14 +363,20 @@ export default {
       };
     },
     /* ------------------------------------------------ refs methods ------------------------------------------------------ */
+    timeString() {
+      var date = new Date();
+      var str =
+        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + "-" + date.getMinutes() + "-" + date.getSeconds();
+      return str;
+    },
     downloadProcessAsXml() {
-      this.downloadProcess("xml");
+      this.downloadProcess("bpmn20.xml", "diagram" + this.timeString());
     },
     downloadProcessAsBpmn() {
-      this.downloadProcess("bpmn");
+      this.downloadProcess("bpmn", "diagram" + this.timeString());
     },
     downloadProcessAsSvg() {
-      this.downloadProcess("svg");
+      this.downloadProcess("svg", "diagram" + this.timeString());
     },
     processSimulation() {
       this.simulationStatus = !this.simulationStatus;

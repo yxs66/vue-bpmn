@@ -5,6 +5,10 @@
         <div slot="title" class="panel-tab__title"><i class="el-icon-info"></i>常规</div>
         <element-base-info :id-edit-disabled="idEditDisabled" :business-object="elementBusinessObject" :type="elementType" />
       </el-collapse-item>
+      <el-collapse-item name="serviceTask" v-if="elementType === 'ServiceTask'" key="serviceTask">
+        <div slot="title" class="panel-tab__title"><i class="el-icon-s-claim"></i>服务任务</div>
+        <service-task :id="elementId" :type="elementType" />
+      </el-collapse-item>
       <el-collapse-item name="condition" v-if="elementType === 'Process'" key="message">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-comment"></i>消息与信号</div>
         <signal-and-massage :force="force" />
@@ -17,13 +21,17 @@
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-order"></i>表单</div>
         <element-form :id="elementId" :type="elementType" />
       </el-collapse-item>
-      <el-collapse-item name="task" v-if="elementType.indexOf('Task') !== -1" key="task">
+      <el-collapse-item name="task" v-if="elementType.indexOf('UserTask') !== -1" key="task">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-claim"></i>任务</div>
         <element-task :id="elementId" :type="elementType" />
       </el-collapse-item>
       <el-collapse-item name="multiInstance" v-if="elementType.indexOf('Task') !== -1" key="multiInstance">
         <div slot="title" class="panel-tab__title"><i class="el-icon-s-help"></i>多实例</div>
         <element-multi-instance :business-object="elementBusinessObject" :type="elementType" />
+      </el-collapse-item>
+      <el-collapse-item name="eventlisteners" v-if="elementType === 'Process' && prefix === 'flowable'" key="eventlisteners">
+        <div slot="title" class="panel-tab__title"><i class="el-icon-message-solid"></i>事件监听器</div>
+        <event-listeners :id="elementId" :type="elementType" />
       </el-collapse-item>
       <el-collapse-item name="listeners" key="listeners">
         <div slot="title" class="panel-tab__title"><i class="el-icon-message-solid"></i>执行监听器</div>
@@ -48,6 +56,7 @@
 import ElementBaseInfo from "./base/ElementBaseInfo";
 import ElementOtherConfig from "./other/ElementOtherConfig";
 import ElementTask from "./task/ElementTask";
+import ServiceTask from "./task/ServiceTask";
 import ElementMultiInstance from "./multi-instance/ElementMultiInstance";
 import FlowCondition from "./flow-condition/FlowCondition";
 import SignalAndMassage from "./signal-message/SignalAndMessage";
@@ -55,6 +64,7 @@ import ElementListeners from "./listeners/ElementListeners";
 import ElementProperties from "./properties/ElementProperties";
 import ElementForm from "./form/ElementForm";
 import UserTaskListeners from "./listeners/UserTaskListeners";
+import EventListeners from "./listeners/EventListeners";
 /**
  * 侧边栏
  * @Author MiyueFE
@@ -65,6 +75,7 @@ export default {
   name: "MyPropertiesPanel",
   components: {
     UserTaskListeners,
+    EventListeners,
     ElementForm,
     ElementProperties,
     ElementListeners,
@@ -72,6 +83,7 @@ export default {
     FlowCondition,
     ElementMultiInstance,
     ElementTask,
+    ServiceTask,
     ElementOtherConfig,
     ElementBaseInfo
   },

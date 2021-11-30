@@ -214,7 +214,7 @@ export default {
       this.fieldList = JSON.parse(JSON.stringify(this.formData.fields || []));
 
       // 更新元素扩展属性，避免后续报错
-      this.updateElementExtensions();
+      // this.updateElementExtensions();
     },
     updateElementFormKey() {
       window.bpmnInstances.modeling.updateProperties(this.bpmnELement, { formKey: this.formKey });
