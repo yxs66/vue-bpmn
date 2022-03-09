@@ -15,6 +15,11 @@
             </div>
             <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-download">下载文件</el-button>
           </el-tooltip>
+           <el-tooltip effect="light" content="保存上传服务器">
+            <el-button :size="headerButtonSize" :type="headerButtonType" icon="el-icon-upload" @click="uploadProcess()">
+              上传
+            </el-button>
+          </el-tooltip>
           <el-tooltip effect="light">
             <div slot="content">
               <el-button :size="headerButtonSize" type="text" @click="previewProcessXML">预览XML</el-button>
@@ -105,6 +110,9 @@ import activitiModdleExtension from "./plugins/extension-moddle/activiti";
 import flowableModdleExtension from "./plugins/extension-moddle/flowable";
 // 引入json转换与高亮
 import convert from "xml-js";
+
+import request from "@/utils/request";
+import { processDeploy } from '@/api/common';
 
 export default {
   name: "MyProcessDesigner",
@@ -237,7 +245,7 @@ export default {
   },
   mounted() {
     this.initBpmnModeler();
-    this.createNewDiagram(this.value);
+    this.createNewDiagram(this.value, 'init');
     this.$once("hook:beforeDestroy", () => {
       if (this.bpmnModeler) this.bpmnModeler.destroy();
       this.$emit("destroy", this.bpmnModeler);
@@ -288,11 +296,34 @@ export default {
       });
     },
     /* 创建新的流程图 */
-    async createNewDiagram(xml) {
+    async createNewDiagram(xml, type) {
+      if(type == 'init'){
+        var name = "href";
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        console.log(window.location.search)
+        var r = window.location.search.substr(1).match(reg);
+        console.log(r)
+        const that = this;
+        if (r != null) {
+          const url = unescape(r[2]);
+          request
+            .get(url)
+            .then(function(res) {
+              that.req(res.data);
+            })
+            .catch(function(err) {
+              that.$message.error('加载流程图失败')
+            });
+          return;
+        }
+      }
       // 将字符串转换成图显示出来
       let newId = this.processId || `Process_${new Date().getTime()}`;
       let newName = this.processName || `业务流程_${new Date().getTime()}`;
       let xmlString = xml || DefaultEmptyXML(newId, newName, this.prefix);
+      this.req(xmlString);
+    },
+    async req(xmlString) {
       try {
         let { warnings } = await this.bpmnModeler.importXML(xmlString);
         this.processReZoom();
@@ -303,7 +334,6 @@ export default {
         console.error(`[Process Designer Warn]: ${e.message || e}`);
       }
     },
-
     // 下载流程图到本地
     async downloadProcess(type, name) {
       try {
@@ -377,6 +407,24 @@ export default {
     },
     downloadProcessAsSvg() {
       this.downloadProcess("svg", "diagram" + this.timeString());
+    },
+    async uploadProcess(){
+      const { err, xml } = await this.bpmnModeler.saveXML();
+      // 读取异常时抛出异常
+      if (err) {
+        console.error(`[Process Designer Warn ]: ${err.message || err}`);
+      }
+      var formData = new FormData();
+      formData.append("file", new Blob([xml], { type : 'application/xml' }), "diagram" + this.timeString() + ".bpmn");
+      try {
+        const result = await processDeploy(formData)
+        this.$message({
+          message: '上传成功',
+          type: 'success'
+        })
+      } catch (err) {
+        this.$message.error('上传失败')
+      }
     },
     processSimulation() {
       this.simulationStatus = !this.simulationStatus;

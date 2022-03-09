@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <process-palette />
     <my-process-designer
       :key="`designer-${reloadIndex}`"
       v-model="xmlString"
@@ -50,11 +49,6 @@
       </el-form>
     </el-drawer>
 
-    <div class="info-tip">
-      <p>注：activiti 好像不支持表单配置，控制台可能会报错</p>
-      <p>更多配置请查看源码：<a href="https://github.com/miyuesc/bpmn-process-designer">MiyueSC/bpmn-process-designer</a></p>
-      <p>疑问请在此留言：<a href="https://github.com/miyuesc/bpmn-process-designer/issues/16">MiyueSC/bpmn-process-designer/issues</a></p>
-    </div>
   </div>
 </template>
 
@@ -67,13 +61,12 @@ import CustomContentPadProvider from "../package/designer/plugins/content-pad";
 // 自定义左侧菜单（修改 默认任务 为 用户任务）
 import CustomPaletteProvider from "../package/designer/plugins/palette";
 import xmlObj2json from "./utils/xml2json";
-import ProcessPalette from "../package/palette/ProcessPalette";
 // 自定义侧边栏
 // import MyProcessPanel from "../package/process-panel/ProcessPanel";
 
 export default {
   name: "App",
-  components: { ProcessPalette },
+  components: {  },
   data() {
     return {
       xmlString: "",
@@ -173,7 +166,7 @@ body {
   height: 100%;
   box-sizing: border-box;
   display: inline-grid;
-  grid-template-columns: 100px auto max-content;
+  grid-template-columns: auto max-content;
 }
 .demo-control-bar {
   position: fixed;
